@@ -1,0 +1,48 @@
+# Vivado runtime junk
+*.jou
+*.log
+*.str
+*.pb
+*.rpx
+.Xil/
+.srcs/
+.cache/
+.hw/
+.ip_user_files/
+.runs/
+.sim/
+vivado_*.backup.jou
+vivado_*.backup.log
+hs_err_*.log
+usage_statistics_webtalk*
+
+# Project files (мы работаем в non-project flow)
+*.xpr
+*.xci
+
+# Build outputs
+build/
+*.bit
+*.dcp
+*.ltx
+*.bin
+*.rpt
+
+# Simulation
+*.vcd
+*.fst
+*.wdb
+*.wlf
+xsim.dir/
+obj_dir/
+sim_build/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editors / OS
+.vscode/
+.idea/
+*~
+Thumbs.db
+.DS_Store

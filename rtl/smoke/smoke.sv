@@ -1,0 +1,13 @@
+`timescale 1ns/1ps
+
+module smoke(
+    input logic clk,
+    input logic d,
+    output logic q
+);
+
+    always_ff @(posedge clk) begin
+        q <= d;
+    end
+
+endmodule
