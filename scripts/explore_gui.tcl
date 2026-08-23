@@ -11,6 +11,9 @@ set TOP  util_synth;
 
 catch {close_project}
 create_project -in_memory -part $PART
+foreach f [glob -nocomplain $REPO/rtl/pkg/*.sv] {
+    read_verilog -sv $f
+}
 read_verilog -sv $REPO/rtl/$TOP.sv
 read_xdc     $REPO/constr/timing_only.xdc
 synth_design -top $TOP -part $PART

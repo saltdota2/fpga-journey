@@ -65,5 +65,5 @@ clean:
 
 .PHONY: sim
 sim:
-	verilator --binary --timing -Irtl $(TB_DIR)/tb_$(TOP).sv -o tb_$(TOP)
+	verilator --binary --timing rtl/pkg/util_pkg.sv $(TB_DIR)/tb_$(TOP).sv -o tb_$(TOP)
 	./obj_dir/tb_$(TOP)

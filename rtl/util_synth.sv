@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 `default_nettype none
-`include "pkg_util.sv"
+import util_pkg::*;
 
 module util_synth (
     input  wire        clk,

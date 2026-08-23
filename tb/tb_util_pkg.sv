@@ -1,8 +1,9 @@
 `timescale 1ns/1ps
-`include "pkg_util.sv"
 
-module tb_pkg_util;
 
+module tb_util_pkg;
+    import util_pkg::*;
+    
     initial begin
         logic[7:0] b, g, b_back;
         int errors = 0;
