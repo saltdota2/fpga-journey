@@ -5,7 +5,7 @@
 
 set REPO [file normalize [file dirname [info script]]/..]
 set PART xc7a35ticsg324-1L
-set TOP  util_synth;
+set TOP  fifo_sync;
 
 
 
