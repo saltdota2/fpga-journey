@@ -1,10 +1,10 @@
 `timescale 1ns/1ps
-`default_nettype none
-
+`default_nettype none    
+    
 module fifo_sync #(
-    parameter int unsigned WIDTH = 32,
-    parameter int unsigned DEPTH = 1024,
-    parameter bit          FWFT  = 1'b1,
+    parameter int unsigned WIDTH = 8,
+    parameter int unsigned DEPTH = 8,
+    parameter bit          FWFT  = 1'b0,
     parameter int unsigned ALMOST_FULL_TH  = DEPTH - 2,
     parameter int unsigned ALMOST_EMPTY_TH = 2
 ) (
@@ -28,7 +28,7 @@ module fifo_sync #(
 
     initial begin
         if (DEPTH < 2)              $fatal(1, "DEPTH must be >= 2, got %0d", DEPTH);
-        if (DEPTH & (DEPTH - 1))    $fatal(1, "DEPTH must be power of 2, got %0d", DEPTH);
+        if ((DEPTH & (DEPTH - 1)) != '0)    $fatal(1, "DEPTH must be power of 2, got %0d", DEPTH);
         if (ALMOST_FULL_TH > DEPTH) $fatal(1, "ALMOST_FULL_TH > DEPTH");
     end
 
@@ -116,6 +116,86 @@ module fifo_sync #(
         end
     endgenerate
 
+`ifndef SYNTHESIS
+    property p_dont_write_when_full;
+        @(posedge clk) disable iff (!rst_n) 
+        full_o |->  (do_wr == '0);
+    endproperty
+    a_dont_write_when_full: assert property(p_dont_write_when_full)
+        else $error("fifo write when full");
+
+
+    property p_dont_read_when_empty;
+        @(posedge clk) disable iff (!rst_n) 
+        empty_o |->  (do_rd == '0);
+    endproperty
+    a_read_when_empty: assert property(p_dont_read_when_empty)
+        else $error("fifo read when empty");
+
+
+    property p_count_less_than_depth;
+        @(posedge clk) disable iff (!rst_n)
+        count_o <= CNT_W'(DEPTH);
+    endproperty
+    a_count_less_depth: assert property(p_count_less_than_depth)
+        else $error("count > CNT_W'(DEPTH)");
+
+
+    property p_full_not_empty;
+        @(posedge clk) disable iff (!rst_n)
+        !(full_o && empty_o);
+    endproperty
+    a_full_not_empty: assert property(p_full_not_empty)
+        else $error("full = empty");
+
+    
+    property p_empty_iff_zero;
+        @(posedge clk) disable iff (!rst_n)
+        empty_o == (count_o == '0);
+    endproperty
+    a_empty_iff_zero: assert property (p_empty_iff_zero)
+        else $error("empty inconsistent with count=%0d", count);
+
+    property p_full_iff_depth;
+        @(posedge clk) disable iff (!rst_n)
+        full_o == (count_o == CNT_W'(DEPTH));
+    endproperty
+    a_full_iff_depth: assert property (p_full_iff_depth)
+        else $error("full inconsistent with count=%0d", count);
+
+    
+    property p_only_write;
+        @(posedge clk) disable iff (!rst_n)
+        (do_wr && !do_rd) |=> (count_o == $past(count_o) + 1'b1);
+    endproperty
+    a_only_write: assert property(p_only_write)
+        else $error("count did not increment after write");
+
+    
+    property p_write_read;
+        @(posedge clk) disable iff (!rst_n)
+        (do_wr && do_rd) |=> (count_o == $past(count_o));
+    endproperty
+    a_write_read: assert property(p_write_read)
+        else $error("count didnt work correct when wr + rd");
+    
+
+    property p_count_dec;
+        @(posedge clk) disable iff (!rst_n)
+        (do_rd && !do_wr) |=> (count == $past(count) - 1'b1);
+    endproperty
+    a_count_dec: assert property (p_count_dec)
+        else $error("count did not decrement");
+
+
+    // Cover
+    c_full_reached:  cover property (@(posedge clk) full_o);
+    c_empty_reached: cover property (@(posedge clk) empty_o);
+    c_wr_when_full:  cover property (@(posedge clk) full_o && wr_en_i);
+    c_rd_when_empty: cover property (@(posedge clk) empty_o && rd_en_i);
+    c_simultaneous:  cover property (@(posedge clk) do_wr && do_rd);
+
+`endif
 endmodule
 
 `default_nettype wire
