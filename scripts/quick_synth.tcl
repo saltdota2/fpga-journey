@@ -3,15 +3,15 @@
 
 set REPO C:/work/fpga-journey
 set PART xc7a35ticsg324-1L
-set TOP  smoke_async_rst
+set TOP  two_clk_top
 
 # закрыть предыдущую сессию, если осталась
 catch {close_project}
 
 create_project -in_memory -part $PART
 read_verilog -sv $REPO/rtl/$TOP.sv
+read_xdc     $REPO/constr/timing_only.xdc
 synth_design -top $TOP -part $PART
 
-puts "\n=========== UTILIZATION ==========="
-report_utilization
-puts "=========== END ==========="
+opt_design
+place_design
