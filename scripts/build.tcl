@@ -50,7 +50,8 @@ if {$MODE eq "impl"} {
     report_utilization       -file $OUTDIR/post_route_util.rpt
     report_drc               -file $OUTDIR/post_route_drc.rpt
     report_clock_utilization -file $OUTDIR/post_route_clk.rpt
-
+    report_timing -delay_type max -max_paths 1 -nworst 1 -input_pins  -file $OUTDIR/post_route_setup.rpt
+    report_timing -delay_type min -max_paths 1 -nworst 1 -input_pins  -file $OUTDIR/post_route_hold.rpt
     write_bitstream -force $OUTDIR/$TOP.bit
 }
 

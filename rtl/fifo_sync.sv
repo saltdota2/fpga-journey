@@ -2,9 +2,9 @@
 `default_nettype none    
     
 module fifo_sync #(
-    parameter int unsigned WIDTH = 8,
-    parameter int unsigned DEPTH = 8,
-    parameter bit          FWFT  = 1'b0,
+    parameter int unsigned WIDTH = 32,
+    parameter int unsigned DEPTH = 1024,
+    parameter bit          FWFT  = 1'b1,
     parameter int unsigned ALMOST_FULL_TH  = DEPTH - 2,
     parameter int unsigned ALMOST_EMPTY_TH = 2
 ) (
@@ -79,7 +79,7 @@ module fifo_sync #(
         end
     end
 
-    assign full_o        = (count == CNT_W'(DEPTH));
+    
     assign almost_full_o = (count >= CNT_W'(ALMOST_FULL_TH));
 
     //=========================================================
@@ -88,10 +88,27 @@ module fifo_sync #(
     generate
         if (FWFT) begin : g_fwft
 
-            logic out_valid;
+            logic out_valid, do_rd_q, full_q;
 
+            always_ff @(posedge clk) begin
+                if(!rst_n)
+                    full_q <= '0;
+                else if(((count + 1'b1) == CNT_W'(DEPTH)) && (do_wr && !do_rd))
+                    full_q <= 1'b1;
+                else if(do_rd && !do_wr)
+                    full_q <= '0;
+            end
+
+            always_ff @(posedge clk) begin
+                if(!rst_n) 
+                    do_rd_q <= '0;
+                else if(do_wr && !do_rd)
+                    do_rd_q <= 1'b1;
+                else if((count == CNT_W'(1)) && (!do_wr && do_rd))
+                    do_rd_q <= '0;
+            end
             // Читаем из памяти, когда есть что и есть куда
-            assign do_rd = (count != '0) && (!out_valid || rd_en_i);
+            assign do_rd = do_rd_q && (!out_valid || rd_en_i);
 
             always_ff @(posedge clk) begin
                 if (!rst_n)                       out_valid <= 1'b0;
@@ -99,6 +116,7 @@ module fifo_sync #(
                 else if (rd_en_i && out_valid)    out_valid <= 1'b0;
             end
 
+            assign full_o         = full_q;
             assign empty_o        = !out_valid;
             assign rd_data_o      = mem_dout;
             assign count_o        = count + CNT_W'(out_valid);
@@ -106,12 +124,21 @@ module fifo_sync #(
 
         end
         else begin : g_std
-
+            logic empty_q;
+            always_ff @(posedge clk) begin
+                if(!rst_n)
+                    empty_q <= 1'b1;
+                else if(do_wr && !do_rd)
+                    empty_q <= '0;
+                else if ((count == CNT_W'(1)) && (!do_wr && do_rd))
+                    empty_q <= 1'b1;
+            end
             assign do_rd          = rd_en_i && !empty_o;
-            assign empty_o        = (count == '0);
+            assign empty_o        = empty_q;
             assign rd_data_o      = mem_dout;
             assign count_o        = count;
             assign almost_empty_o = (count <= CNT_W'(ALMOST_EMPTY_TH));
+            assign full_o        = count[CNT_W-1];
 
         end
     endgenerate
