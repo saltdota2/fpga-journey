@@ -65,5 +65,5 @@ clean:
 
 .PHONY: sim
 sim:
-	verilator --binary --timing --assert rtl/fifo_sync.sv $(TB_DIR)/tb_$(TOP).sv -o tb_$(TOP)
+	verilator --binary --timing --assert rtl/$(TOP).sv $(TB_DIR)/tb_$(TOP).sv -o tb_$(TOP)
 	./obj_dir/tb_$(TOP)

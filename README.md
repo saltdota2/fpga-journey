@@ -17,7 +17,7 @@ Target: AMD Artix-7 (xc7a35ticsg324-1L), Vivado 2022.1, non-project flow.
 | `tb/` | тестбенчи |
 | `constr/` | XDC-констрейнты |
 | `scripts/` | Tcl для non-project flow |
-| `docs/` | конспекты, roadmap, прогресс |
+| `docs/` | конспекты, roadmap |
 
 ## Модули
 
