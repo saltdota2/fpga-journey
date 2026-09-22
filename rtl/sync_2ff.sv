@@ -1,3 +1,6 @@
+`timescale 1ns/1ps
+`default_nettype none
+
 module sync_2ff #(
     parameter int unsigned STAGES = 2
 ) (
@@ -20,4 +23,4 @@ module sync_2ff #(
     assign sync_o = sync_ff[STAGES-1];
 
 endmodule
-
+`default_nettype wire
