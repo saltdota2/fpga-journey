@@ -1,7 +1,5 @@
 `timescale 1ns/1ps
 `default_nettype none
-`include "clk_gen.sv"
-`include "sync_2ff.sv"
 
 module two_clk_top(
     input wire clk,

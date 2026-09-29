@@ -1,6 +1,5 @@
 `default_nettype none
 `timescale 1ns/1ps
-`include "reset_sync.sv"
 
 module async_reset_test(
     input wire clk,

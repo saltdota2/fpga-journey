@@ -1,6 +1,5 @@
 `default_nettype none
 `timescale 1ns/1ps
-`include "reduction_chain.sv"
 
 module reduction_chain_harness #(
     parameter int unsigned N     = 16,

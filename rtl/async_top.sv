@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 `default_nettype none
-`include "sync_2ff.sv"
 
 module async_top (
     input  wire        clk_a,

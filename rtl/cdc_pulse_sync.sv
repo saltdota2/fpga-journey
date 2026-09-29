@@ -2,8 +2,7 @@
 `default_nettype none
 
 module cdc_pulse_sync #(
-    parameter int unsigned STAGES = 2,
-    parameter int unsigned kt     = 2  
+    parameter int unsigned STAGES = 2
 ) (
     // Домен источника
     input  wire  clk_src,
@@ -36,31 +35,21 @@ module cdc_pulse_sync #(
 
 `ifndef SYNTHESIS
 
-localparam int unsigned MIN_GAP = 2 * Kt;
-
 property p_pulse_one_cycle;
-    @(posedge clk_dst) disable iff(!rst_dst_n)
+    @(posedge clk_dst) disable iff (!rst_dst_n)
     pulse_o |=> !pulse_o;
 endproperty
-a_pulse_one_cycle: assert property(p_pulse_one_cycle)
+a_pulse_one_cycle: assert property (p_pulse_one_cycle)
     else $error("pulse_o stayed high more than one cycle");
 
-
-
-int unsigned gap_cnt;
-always_ff @(posedge clk_src) begin
-    if(!rst_src_n) gap_cnt <= MIN_GAP;
-    else if(pulse_i) gap_cnt <= 0S;
-    else if(gap_cnt<MIN_GAP) gap_cnt <= gap_cnt + 1;
-end
-
+// Новый импульс разрешён, только когда предыдущий toggle
+// полностью прошёл синхронизатор
 property p_pulse_spacing;
-    @(posedge clk_src) disable iff(!rst_src_n)
-    pulse_i |-> (gap_cnt >= MIN_GAP);
+    @(posedge clk_src) disable iff (!rst_src_n || !rst_dst_n)
+    pulse_i |-> (toggle_src == sync_dst[STAGES]);
 endproperty
-
 m_pulse_spacing: assume property (p_pulse_spacing)
-    else $error("pusle_i too often");
+    else $error("pulse_i too often: previous event still in flight");
 
 `endif
 endmodule

@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 `default_nettype none
-`include "mac_unit.sv"
 
 module mac_harness #(
     parameter int unsigned STAGES = 4

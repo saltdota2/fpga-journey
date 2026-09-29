@@ -73,6 +73,37 @@ module cdc_handshake #(
         .pulse_o(ack_pulse)
     );
 
+`ifndef SYNTHESIS
+
+    property p_valid_o_one_beat;
+    @(posedge clk_dst) disable iff(!rst_dst_n)
+    valid_o |=> !valid_o;
+    endproperty
+    a_valid_o_one_beat: assert property(p_valid_o_one_beat)
+        else $error("valid_o active more time than one beat");
+    
+    property p_ready_fall_correct;
+    @(posedge clk_src) disable iff(!rst_src_n)
+    (valid_i && ready_o) |=> !ready_o;
+    endproperty
+    a_ready_fall_correct: assert property(p_ready_fall_correct)
+        else $error("ready_o dont fall in correct time");
+
+    property p_data_stable_while_not_ready;
+    @(posedge clk_src) disable iff(!rst_src_n)
+    !ready_o |=> $stable(data_q);
+    endproperty
+    a_data_stable_while_not_ready: assert property(p_data_stable_while_not_ready)
+        else $error("data_q changed while ready_o = 0");
+    
+    property p_ready_didnt_rise_without_ack;
+    @(posedge clk_src) disable iff(!rst_src_n)
+    $rose(ready_o) |-> $past(ack_pulse);
+    endproperty
+    a_ready_didnt_rise_without_ack: assert property(p_ready_didnt_rise_without_ack)
+        else $error("ready_o rose without ack_pulse");
+`endif
+
 endmodule
 
 `default_nettype wire
