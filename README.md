@@ -24,5 +24,7 @@ Target: AMD Artix-7 (xc7a35ticsg324-1L), Vivado 2022.1, non-project flow.
 | Модуль | Описание | LUT | FF | Fmax |
 |---|---|---|---|---|
 | `led_blink` | параметризуемый мигатель | 35 | 27 | ~250 МГц |
-| `fifo_sync` | параметризуемый sync FIFO, standard/FWFT | 63 LUT | 34 FF | 1 BRAM |
+| `fifo_sync` | параметризуемый sync FIFO, standard/FWFT | 63 LUT | 34 FF | 1 BRAM | ~400Мгц |
+| `async_fifo`| параметризируемый async FIFO |
+|  `FIR`      | 31-отводный КИХ фильтр нижних частот | вход и выход в вормате Q1.15 | 
 #

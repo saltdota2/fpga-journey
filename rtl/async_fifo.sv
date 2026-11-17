@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 `default_nettype none
 
-module fifo_async #(
+module async_fifo #(
     parameter int unsigned WIDTH  = 32,
     parameter int unsigned DEPTH  = 16,     // степень двойки, >= 4
     parameter int unsigned STAGES = 2       // ступеней синхронизатора, >= 2

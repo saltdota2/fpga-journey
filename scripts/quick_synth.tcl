@@ -3,14 +3,14 @@
 
 set REPO C:/work/fpga-journey
 set PART xc7a35ticsg324-1L
-set TOP  top_cdc_handshake
+set TOP  async_fifo.sv
 
 # закрыть предыдущую сессию, если осталась
 catch {close_project}
 
 create_project -in_memory -part $PART
 read_verilog -sv [glob $REPO/rtl/*.sv]
-read_xdc     $REPO/constr/constr_for_cdc_hs.xdc
+read_xdc     $REPO/constr/constr_for_async_fifo.xdc
 synth_design -top $TOP -part $PART
 
 
